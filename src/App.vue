@@ -34,6 +34,7 @@ export default {
   },
   data() {
     return {
+      videosBatch: [],
       videos: [],
       reformattedSearchString: '',
       api: {
@@ -43,7 +44,8 @@ export default {
         order: 'viewCount',
         maxResults: 12,
         q: '',
-        key: 'YOUR_API_KEY',
+        key: 'AIzaSyChcN9BCzbRkB1OabRc-wu6w0czE0R7LXw',
+        channelId: 'UCQR8sXTU6WZyhT_qHiXlnsA',
         prevPageToken: '',
         nextPageToken: ''
       }
@@ -53,9 +55,29 @@ export default {
     search(searchParams) {
       this.reformattedSearchString = searchParams.join(' ');
       this.api.q = searchParams.join('+');
-      const { baseUrl, part, type, order, maxResults, q, key } = this.api;
-      const apiUrl = `${baseUrl}part=${part}&type=${type}&order=${order}&q=${q}&maxResults=${maxResults}&key=${key}`;
-      this.getData(apiUrl);
+      const { baseUrl, part, type, order, maxResults, q, key, channelId } = this.api;
+
+      var channels = ['UCjtVqxd_0CIGVjwRUBxu2iw', 'UCQR8sXTU6WZyhT_qHiXlnsA'];
+      var apiUrl = '';
+      const collectVideos = [];
+      //Object.keys(channels).forEach(function(i){
+        apiUrl = `${baseUrl}part=${part}&type=${type}&order=${order}&q=${q}&maxResults=${maxResults}&key=${key}&channelId=${channelId}`;
+        
+        //apiUrl = `${baseUrl}part=${part}&type=${type}&order=${order}&q=${q}&maxResults=${maxResults}&key=${key}&channelId=`+channels[i];
+     
+        this.getData(apiUrl);
+
+        if( this.videosBatch.length > 0 ){
+          var obj = this.videosBatch;
+          console.log(obj);
+          Object.keys(obj).forEach(function(key) {
+            collectVideos.push(obj[key]);
+          });
+        }
+      //});
+
+      this.videos = collectVideos;
+     
     },
 
     prevPage() {
@@ -74,11 +96,11 @@ export default {
       axios
         .get(apiUrl)
         .then(res => {
-          this.videos = res.data.items;
+          this.videosBatch = res.data.items;
           this.api.prevPageToken = res.data.prevPageToken;
           this.api.nextPageToken = res.data.nextPageToken;
         })
-        .catch(error => console.log(error));
+        //.catch(error => console.log(error));
     }
   }
 };
